@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../providers/shared_prefs_provider.dart';
 import '../routes/app_routes.dart';
+import '../providers/secure_storage_provider.dart';
 
 class HomePage extends ConsumerWidget {
   const HomePage({super.key});
@@ -20,8 +21,13 @@ class HomePage extends ConsumerWidget {
             SizedBox(height: 22),
             ElevatedButton(
               onPressed: () async {
+                final storage = ref.watch(secureStorageProvider);
                 await prefs.remove('username');
-                Navigator.pushReplacementNamed(context, AppRoutes.login);
+                await storage.delete(key: 'token');
+
+                if (context.mounted) {
+                  Navigator.pushReplacementNamed(context, AppRoutes.login);
+                }
               },
               child: const Text('Logout'),
             ),
